@@ -1,0 +1,21 @@
+%% Github Commands!
+% Create account on github.com
+
+% Open a command prompt (windows)/terminal (Mac)
+% git clone https://github.com/tridentmakarov/BE521Final.git
+
+% cd /BE521Final
+
+%% If you want a new branch
+	% git checkout -b BRANCH_NAME  <<< Only if you want a new branch
+
+%% To push code!
+
+% git add .
+% git commit -m 'COMMIT MESSAGE'
+% git push
+
+%
+
+% Follow these instructions
+% https://help.github.com/en/articles/creating-a-personal-access-token-for-the-command-line
