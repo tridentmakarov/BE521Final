@@ -3,6 +3,7 @@
 Open a command prompt (windows)/terminal (Mac)
 
 git clone https://github.com/tridentmakarov/BE521Final.git
+
 cd /BE521Final
 
 % If you want a new branch
@@ -12,23 +13,30 @@ cd /BE521Final
 % To push code!
 
 git add .
+
 git commit -m 'COMMIT MESSAGE'
+
 git push
 
 
 % First time, it'll error
 
 Follow these instructions
+
 https://help.github.com/en/articles/creating-a-personal-access-token-for-the-command-line
 
 Sign in, 
+
 Username: YOUR_USERNAME
+
 Password: ACCESS_TOKEN_FROM_INSTRUCTIONS
 
 
 % ANNOYING THING MATLAB DOES:
+
 It'll do this "processing" thing, I recommend doing this:
 
 Go to preferences, then Matlab  > General > Source Control
+
 disable the automatic source control by selecting "None".
 
