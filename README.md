@@ -1,21 +1,21 @@
 # BE521Final
 
-% Github Commands!
 Create account on github.com
-
 Open a command prompt (windows)/terminal (Mac)
-git clone https://github.com/tridentmakarov/BE521Final.git
 
+git clone https://github.com/tridentmakarov/BE521Final.git
 cd /BE521Final
 
 % If you want a new branch
 	git checkout -b BRANCH_NAME  <<< Only if you want a new branch
+
 
 % To push code!
 
 git add .
 git commit -m 'COMMIT MESSAGE'
 git push
+
 
 % First time, it'll error
 
@@ -25,6 +25,7 @@ https://help.github.com/en/articles/creating-a-personal-access-token-for-the-com
 Sign in, 
 Username: YOUR_USERNAME
 Password: ACCESS_TOKEN_FROM_INSTRUCTIONS
+
 
 % ANNOYING THING MATLAB DOES:
 It'll do this "processing" thing, I recommend doing this:
