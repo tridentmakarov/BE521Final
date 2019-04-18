@@ -7,7 +7,7 @@ git clone https://github.com/tridentmakarov/BE521Final.git
 cd /BE521Final
 
 # If you want a new branch
-	git checkout -b BRANCH_NAME  <<< Only if you want a new branch
+	git checkout -b BRANCH_NAME  # Only if you want a new branch
 
 
 # To push code!
