@@ -1,6 +1,5 @@
 # BE521Final
 
-Create account on github.com
 Open a command prompt (windows)/terminal (Mac)
 
 git clone https://github.com/tridentmakarov/BE521Final.git
