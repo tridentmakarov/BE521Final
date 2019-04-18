@@ -1,62 +1,14 @@
 clc
-clearvars -except sub_1_training_ecog...
-	
+clearvars -except test
 close all
 
 %% This will be the main code
 
+load('BE521Final');
 
-% 	I521_Sub1_Training_ecog = IEEGSession('I521_Sub1_Training_ecog','Luke Jungmann','Luk_ieeglogin.bin');
-% 	nr = ceil((I521_Sub1_Training_ecog.data.rawChannels(1).get_tsdetails.getEndTime)/1e6*I521_Sub1_Training_ecog.data(1).sampleRate);
-% 	I521_Sub1_Training_ecog = I521_Sub1_Training_ecog.data.getvalues(1:300000, 1:length(I521_Sub1_Training_ecog.data.rawChannels));
-% 
-% 	
-% 	I521_Sub1_Training_dg = IEEGSession('I521_Sub1_Training_ecog','Luke Jungmann','Luk_ieeglogin.bin');
-% 	nr = ceil((I521_Sub1_Training_dg.data.rawChannels(1).get_tsdetails.getEndTime)/1e6*I521_Sub1_Training_dg.data(1).sampleRate);
-% 	I521_Sub1_Training_dg = I521_Sub1_Training_dg.data.getvalues(1:300000, 1:length(I521_Sub1_Training_dg.data.rawChannels));
-		
-% 	I521_Sub1_Leaderboard_ecog = IEEGSession('I521_Sub1_Training_ecog','Luke Jungmann','Luk_ieeglogin.bin');
-% 	nr = ceil((I521_Sub1_Leaderboard_ecog.data.rawChannels(1).get_tsdetails.getEndTime)/1e6*I521_Sub1_Leaderboard_ecog.data(1).sampleRate);
-% 	I521_Sub1_Leaderboard_ecog = I521_Sub1_Leaderboard_ecog.data.getvalues(1:300000, 1:length(I521_Sub1_Leaderboard_ecog.data.rawChannels));
-	
-% 	I521_Sub1_Training_ecog = IEEGSession('I521_Sub1_Training_ecog','Luke Jungmann','Luk_ieeglogin.bin');
-% 	nr = ceil((I521_Sub1_Training_ecog.data.rawChannels(1).get_tsdetails.getEndTime)/1e6*I521_Sub1_Training_ecog.data(1).sampleRate);
-% 	I521_Sub1_Training_ecog = I521_Sub1_Training_ecog.data.getvalues(1:300000, 1:length(I521_Sub1_Training_ecog.data.rawChannels));
-% 
-% 	
-% 	I521_Sub1_Training_dg = IEEGSession('I521_Sub1_Training_ecog','Luke Jungmann','Luk_ieeglogin.bin');
-% 	nr = ceil((I521_Sub1_Training_dg.data.rawChannels(1).get_tsdetails.getEndTime)/1e6*I521_Sub1_Training_dg.data(1).sampleRate);
-% 	I521_Sub1_Training_dg = I521_Sub1_Training_dg.data.getvalues(1:300000, 1:length(I521_Sub1_Training_dg.data.rawChannels));
-		
-% 	I521_Sub1_Leaderboard_ecog = IEEGSession('I521_Sub1_Training_ecog','Luke Jungmann','Luk_ieeglogin.bin');
-% 	nr = ceil((I521_Sub1_Leaderboard_ecog.data.rawChannels(1).get_tsdetails.getEndTime)/1e6*I521_Sub1_Leaderboard_ecog.data(1).sampleRate);
-% 	I521_Sub1_Leaderboard_ecog = I521_Sub1_Leaderboard_ecog.data.getvalues(1:300000, 1:length(I521_Sub1_Leaderboard_ecog.data.rawChannels));
-% 	I521_Sub1_Training_ecog = IEEGSession('I521_Sub1_Training_ecog','Luke Jungmann','Luk_ieeglogin.bin');
-% 	nr = ceil((I521_Sub1_Training_ecog.data.rawChannels(1).get_tsdetails.getEndTime)/1e6*I521_Sub1_Training_ecog.data(1).sampleRate);
-% 	I521_Sub1_Training_ecog = I521_Sub1_Training_ecog.data.getvalues(1:300000, 1:length(I521_Sub1_Training_ecog.data.rawChannels));
-% 
-% 	
-% 	I521_Sub1_Training_dg = IEEGSession('I521_Sub1_Training_ecog','Luke Jungmann','Luk_ieeglogin.bin');
-% 	nr = ceil((I521_Sub1_Training_dg.data.rawChannels(1).get_tsdetails.getEndTime)/1e6*I521_Sub1_Training_dg.data(1).sampleRate);
-% 	I521_Sub1_Training_dg = I521_Sub1_Training_dg.data.getvalues(1:300000, 1:length(I521_Sub1_Training_dg.data.rawChannels));
-		
-% 	I521_Sub1_Leaderboard_ecog = IEEGSession('I521_Sub1_Training_ecog','Luke Jungmann','Luk_ieeglogin.bin');
-% 	nr = ceil((I521_Sub1_Leaderboard_ecog.data.rawChannels(1).get_tsdetails.getEndTime)/1e6*I521_Sub1_Leaderboard_ecog.data(1).sampleRate);
-% 	I521_Sub1_Leaderboard_ecog = I521_Sub1_Leaderboard_ecog.data.getvalues(1:300000, 1:length(I521_Sub1_Leaderboard_ecog.data.rawChannels));
+save('I521_Sub1_Training_dg)
 
-	
-	
-	save('I521_Sub1_Training_ecog.mat', 'I521_Sub1_Training_ecog');
+save('Training_dg', 'I521_Sub1_Training_dg', 'I521_Sub1_Training_dg', 'I521_Sub1_Training_dg');
+save('Training_ecog', 'I521_Sub1_Training_ecog', 'I521_Sub1_Training_ecog', 'I521_Sub1_Training_ecog');
+save('Testing_ecog', 'I521_Sub1_Leaderboard_ecog', 'I521_Sub2_Leaderboard_ecog', 'I521_Sub3_Leaderboard_ecog');
 
-
-% I521_Sub1_Training_ecog
-% I521_Sub1_Training_dg
-% I521_Sub1_Leaderboard_ecog
-
-% I521_Sub2_Training_ecog
-% I521_Sub2_Training_dg
-% I521_Sub2_Leaderboard_ecog
-
-% I521_Sub3_Training_ecog
-% I521_Sub3_Training_dg
-% I521_Sub3_Leaderboard_ecog
