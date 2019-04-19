@@ -22,10 +22,10 @@ for i = 1:size(train_mini_ecog, 2)
 	
 	set = train_mini_ecog(:, i);
 	
-	[LL_data(i, :), A, E, ZX, t_int] = MovingWinFeats(set, sampleRate, winLen, winDisp, LLFn, ranges);
+	[LL_data(i, :, :), A, E, ZX, t_int] = MovingWinFeats(set, sampleRate, winLen, winDisp, LLFn, ranges);
 
 end
-disp()
+disp('test')
 % for i = 1:5
 % 	temp = decimate(train_mini_dg(:, i), 50);
 % 	dg(:, i) = temp(4:length(temp));
