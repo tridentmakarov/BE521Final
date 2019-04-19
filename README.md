@@ -11,6 +11,7 @@ cd /BE521Final
 # Updating if there's changes
 
 git pull
+
 git reset --hard origin/master <<<not usually necessary, but if you're on master it shouldn't hurt
 
 # If you want a new branch
