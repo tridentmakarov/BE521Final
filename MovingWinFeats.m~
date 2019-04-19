@@ -41,7 +41,7 @@ function [output, A, E, ZX, time] = MovingWinFeats(x, fs, winLen, winDisp, featF
 		
 		x_0 = x_0 + winOffset;
 	end
-	
-	output = [LL', freq_mag];
 end
+
+output = freq_mag, 
 
