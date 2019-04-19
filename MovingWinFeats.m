@@ -31,7 +31,7 @@ function [output, A, E, ZX, time] = MovingWinFeats(x, fs, winLen, winDisp, featF
 		[s, f, ~] = spectrogram(x_i,100,50,'yaxis');
 		f = f/pi*180;
 		for j = 1:5
-			freq_mag(i, j) = mean(s(f > ranges(j,1) & f < ranges(j, 2)));
+			freq_mag(i, j) = abs(mean(s(f > ranges(j,1) & f < ranges(j, 2))));
 		end
 		
 		%Extra features calculations
