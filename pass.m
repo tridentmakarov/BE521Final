@@ -1,0 +1,1 @@
+yourPath = IEEGSession.createPwdFile('Luke Jungmann','JungmannSEAS53');
