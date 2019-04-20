@@ -61,5 +61,20 @@ B = inv(X{1}' * X{1}) * X{1}' * Y;
 Y_p = X{2} * B;
 correlation = corr(Y_p(:, 1), Y_test(1:997, 1));
 
+for i = 1:5
+	y = Y_p(:, i);
+	x = 1:length(y); 
+	xq1 = 1:1/50:length(y);
+	sp(i, :) = spline(x,y,xq1);
+	c(i) = corr(sp(i, :)', dg_test(1:length(sp(i, :)), i));
+
+	figure()
+	plot(sp(i, :))
+	hold on
+	plot(dg_test(1:length(sp(i, :)), i));
+	legend('calculated', 'actual')
+	hold off
+end
+
 % end
 
