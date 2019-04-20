@@ -8,7 +8,6 @@ function [LL_data] = getFeatures(train_mini_ecog)
 	% LLFn = @(x) sum(abs(diff(x)));
 	LLFn = @(x) mean(x);
 	sampleRate = 1000; %samples/s
-	fs = 1000;
 	ranges = [5, 15; 20, 25; 75, 115; 125, 160; 160, 175];
 
 	for i = 1:size(train_mini_ecog, 2)
