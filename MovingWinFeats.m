@@ -1,4 +1,4 @@
-function [output, A, E, ZX, time] = MovingWinFeats(x, fs, winLen, winDisp, featFn, ranges)
+function [LL, freq_mag, A, E, ZX, time] = MovingWinFeats(x, fs, winLen, winDisp, featFn, ranges)
 	% Inputs:
 		% x: signal
 		% fs: signal frequency (Hz)
@@ -11,7 +11,7 @@ function [output, A, E, ZX, time] = MovingWinFeats(x, fs, winLen, winDisp, featF
 	
 	x_0 = 1;
 	
-	NumWins = ((length(x)/fs - winLen)/winDisp);
+	NumWins = ((length(x)/fs)/winDisp)-1;
 	ni = rem((length(x)/fs - winLen), winDisp);
 	
 	%Three extra features
@@ -41,7 +41,5 @@ function [output, A, E, ZX, time] = MovingWinFeats(x, fs, winLen, winDisp, featF
 		
 		x_0 = x_0 + winOffset;
 	end
-	
-	output = [LL', freq_mag];
 end
 

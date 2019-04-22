@@ -2,61 +2,160 @@ clc
 clearvars -except
 close all
 
-%% This will be the main code
+%% Step 0: Load in data
+
+% session = IEEGSession('I521_Sub3_Leaderboard_ecog','Luke Jungmann','Luk_ieeglogin.bin');
+% nr = ceil((session.data.rawChannels(1).get_tsdetails.getEndTime)/1e6*session.data.sampleRate);
+% test_ecog_3 = session.data.getvalues(1:320000, 1:length(session.data.rawChannels));
+% remove_pos = find(isnan(test_ecog_3(:, 1)), 1, 'first');
+% test_ecog_3 = test_ecog_3(1:remove_pos-1, :);
+% save('data/test_ecog_3.mat', 'test_ecog_3')
+
 
 load('data/train_ecog_1.mat')
 load('data/train_dg_1.mat')
 load('data/test_ecog_1.mat')
 
-ecog_train = train_ecog_1(1:250000, :);
-ecog_test = train_ecog_1(250001:300000, :);
+load('data/train_ecog_2.mat')
+load('data/train_dg_2.mat')
+load('data/test_ecog_2.mat')
 
-dg_train = train_dg_1(1:250000, :);
-dg_test = train_dg_1(250001:300000, :);
+load('data/train_ecog_3.mat')
+load('data/train_dg_3.mat')
+load('data/test_ecog_3.mat')
 
-% remove_samples = 0.04 * 1000;
+ecog_sets = {train_ecog_1, train_ecog_2, train_ecog_3};
+dg_sets = {train_dg_1, train_dg_2, train_dg_3};
+test_sets = {test_ecog_1, test_ecog_2, test_ecog_3};
 
-if ~isfile('features_train.mat') && ~isfile('features_test.mat')
-	features_train = getFeatures(ecog_train);
-	save('features_train.mat', 'features_train');
-	features_test = getFeatures(ecog_test);
-	save('features_test.mat', 'features_test');
-else
-	load('features_train.mat');
-	load('features_test.mat');
-end
+testing = false;
 
-for i = 1:5
-	temp = decimate(dg_train(:, i), 50);
-	Y(:, i) = temp(3:length(temp));
-	temp2 = decimate(dg_test(:, i), 50);
-	Y_test(:, i) = temp2(3:length(temp2));
-end
 
-for k = 1:2
-	dataset = features_train;
+for set = 1:3
+	%% Step 1: Get features
+	fprintf('Getting features for person %d\n', set)
+	ecog_train = ecog_sets{set};
+	if testing == true
+		ecog_test = ecog_sets{set};
+	else
+		ecog_test = test_sets{set};
+	end
 
-	M = size(dataset, 2);
-	N = size(dataset, 3); % Time Bins
-	v = size(dataset, 1);
+	dg_train = dg_sets{set};
+	dg_test = dg_sets{set};
 
-	rows = M;
-	cols = N * v;
-	R = ones(rows, cols);
-	one_col = ones(rows, 1);
 
-	for i = 1:v
-		d = dataset(i, :, :);
-		for j = 1:M
-			R(j, (i-1)*N+1:i*N) = d(j:j+N-1);
-		end
+	filename_train = sprintf('features_train_%d.mat', set);
+	filename_test = sprintf('features_test_%d.mat', set);
+	
+	
+	if ~isfile(filename_train)
+		features_train = getFeatures(ecog_train);
+		fprintf('Saving file: %s\n', filename_train);
+		save(filename_train, 'features_train');
+	else
+		load(filename_train);
 	end
 	
-	X{k} = [one_col, R];
-	B = inv(R' * R) * R' * Y;
+	if ~isfile(filename_test)
+		features_test = getFeatures(ecog_test);
+		fprintf('Saving file: %s\n', filename_test);
+		save(filename_test, 'features_test');
+	else
+		load(filename_test);
+	end
+
+	%% Step 2: Decimate
+	disp('Decimating')
+	for i = 1:5
+		move_times(i) = averageMovementTime(dg_train(:, i)); % Get times
+		temp = decimate(dg_train(:, i), 50); % Decimate to get Y matrix
+		Y(:, i) = temp(2:length(temp)); % Remove value
+		
+		if testing == true
+			temp2 = decimate(dg_test(:, i), 50);
+			Y_test(:, i) = temp2(2:length(temp2));
+		end
+	end
+
+	%% Step 3: Linear regression
+	disp('Performing regression')
+	datasets = {features_train, features_test}; % Easier using cell array
+
+	for k = 1:2
+		dataset = datasets{k}; % Get data
+
+		M = size(dataset, 1); % Timepoints
+		N = size(dataset, 2); % Time Bins
+		v = size(dataset, 3); % Neurons
+
+		rows = M-2; % Timepoints minus 2 extra time values
+		cols = N * v * 3; % Neurons times features times 3 (for overlap)
+		R = ones(rows, cols); % Create matrix
+		one_col = ones(rows, 1); % Ones column
+
+		% Run through each neuron (will be something like 62, 44, etc)
+		for i = 1 : v
+			data = squeeze(dataset(:, :, i)); % Remove extra dimension
+
+			% Run through each of the timepoints (will be something like 4999)
+			for j = 3 : M
+				% Get the last three position values, for 150ms lag
+				R(j-2, (i-1)*N*3+1 : i*N*3) = [data(j-2, :),  data(j-1, :), data(j, :)];
+			end
+		end
+
+		% Add to cell array
+		X{k} = [one_col, R];
+
+	end
+
+	% Ensure the Y matrices are the right sizes for calculation
+	Y_train = Y(1:size(X{1}, 1), :);
+	if testing == true
+		Y_test = Y_test(1:size(X{2}, 1), :);
+	end
+
+	% Create the B matrix
+	B = inv(X{1}' * X{1}) * X{1}' * Y_train;
+	Y_B = X{2} * B;
+	Y_B = [Y_B(1, :); Y_B(1, :); Y_B; Y_B(size(Y_B, 1),:)];
+	
+	Y_testing = {1} * B;
+
+% 	% Test correlation
+% % 	correlation = corr(Y_testing(:, 1), Y_train(:, 1));
+
+
+	%% Step 4: Interpolation
+	% Run through each finger
+	disp('Interpolating the finger positions')
+	for i = 1:5
+		y = Y_B(:, i); % Get y value of finger
+		x = 1:length(y); % Get x values of finger
+		xq1 = 1:1/50:length(y)+1; % Interpolate positions
+		xq1 = xq1(1:size(test_ecog_1, 1));
+		sp(i, :) = spline(x,y,xq1); % Spline
+
+		res(i, :) = calcMovement(sp(i, :), move_times);
+
+		if testing == true % Run if testing
+			c(i) = corr(res(i, :)', dg_train(1:length(sp(i, :)), i));
+
+			figure()
+			hold on
+			plot(res(i, :))
+			plot(dg_train(1:length(sp(i, :)), i), '--');
+			legend('calculated', 'actual')
+			hold off
+		end
+	end
+	if testing == false
+		predicted_dg{set} = res(:, 1:size(test_ecog_1, 1))';
+	end
+end
+if testing == false
+	save('predicted_dg.mat', 'predicted_dg');
 end
 
-Y_p = X_test * B;
-
-% end
 

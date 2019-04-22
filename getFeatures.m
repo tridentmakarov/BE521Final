@@ -1,4 +1,4 @@
-function [LL_data] = getFeatures(train_mini_ecog)
+function [output] = getFeatures(train_data)
 %UNTITLED Summary of this function goes here
 %   Detailed explanation goes here
 % 	times = linspace(0, size(train_mini_dg, 1)*1000/1E6, size(train_mini_dg, 1))';
@@ -10,12 +10,13 @@ function [LL_data] = getFeatures(train_mini_ecog)
 	sampleRate = 1000; %samples/s
 	ranges = [5, 15; 20, 25; 75, 115; 125, 160; 160, 175];
 
-	for i = 1:size(train_mini_ecog, 2)
+	for i = 1:size(train_data, 2)
 
-		set = train_mini_ecog(:, i);
+		set = train_data(:, i);
 
-		[LL_data(i, :, :), A, E, ZX, t_int] = MovingWinFeats(set, sampleRate, winLen, winDisp, LLFn, ranges);
+		[LL, freq_mag, A, E, ZX, t_int] = MovingWinFeats(set, sampleRate, winLen, winDisp, LLFn, ranges);
 
+		output(:, :, i) = [LL', freq_mag];
 	end
 end
 
