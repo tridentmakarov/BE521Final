@@ -21,6 +21,7 @@ num_samples = 147500;
 test_ecog{1} = test_ecog_1;
 test_ecog{2} = test_ecog_2;
 test_ecog{3} = test_ecog_3;
+test_ecog = test_ecog';
 
 Sub1_lead_feat = getFeatures(test_ecog{1});
 Sub2_lead_feat = getFeatures(test_ecog{2});
@@ -33,20 +34,20 @@ duration = (num_samples/SampleRate); %seconds
 M = duration/win_s; %num of time bins
 num_feat = 6;
 p = 1:N; %setting new starting indices
-q = M-2*N:M-N; %setting new ending indices. the -2 and -3 is to account for fact that the features only have 2948 time bins instead of 6000
+q = p+2943; %setting new ending indices. the -2 and -3 is to account for fact that the features only have 2948 time bins instead of 6000
 %% Sub1 Feats Calculation
 Sub1_num_chan = size(test_ecog_1,2);
-v = Sub1_num_chan;
-total_bins = v*N;
-columns = total_bins + 1; %to account for intercept term
-next_start = 1:N:columns-1; 
+v1 = Sub1_num_chan;
+total_bins1 = v1*N;
+columns1 = total_bins1 + 1; %to account for intercept term
+next_start1 = 1:N:columns1-1; 
 
 for feat = 1:6
-    for c = v:-1:1 %to cycle through all of the channels backwards
+    for c = v1:-1:1 %to cycle through all of the channels backwards
         for k = 1:N %number of bin
-            start = next_start(c);
-            new_start = start+k;
-            X1(:,new_start, feat) = Sub1_lead_feat(c,p(k):q(k),feat);
+            start1 = next_start1(c);
+            new_start1 = start1+k;
+            X1(:,new_start1, feat) = Sub1_lead_feat(c,p(k):q(k),feat);
         end
     end
     X1(:, 1, feat) = 1;
@@ -75,8 +76,8 @@ end
 new_X1 = reshape(X1, size(X1, 1), []);
 
 for i = 1:5
-    f = floor((length(train_dg_1(:,i))/length(new_X1)));
-    downsampled_Sub1_dg_data = decimate(train_dg_1(:,i),f);
+    f1 = floor((length(train_dg_1(:,i))/length(new_X1)));
+    downsampled_Sub1_dg_data = decimate(train_dg_1(:,i),2);
     adjusted_downsample1 = downsampled_Sub1_dg_data(1:length(new_X1));
 
     feat_i1 = mldivide(new_X1'*new_X1,new_X1'*adjusted_downsample1);
@@ -89,7 +90,8 @@ for i = 1:5
     hold off
     title('Predicted vs Actual')
     legend('Predicted', 'Actual')
-    accuracy(i) = corr(feat_u1, adjusted_downsample1);
+    accuracy1(i) = corr(feat_u1, adjusted_downsample1);
+    feat_pred1(i,:) = feat_u1;
 end
 %% Sub2 Feats Calculation
 Sub2_num_chan = size(test_ecog_2,2);
@@ -147,6 +149,7 @@ for i = 1:5
     title('Predicted vs Actual')
     legend('Predicted', 'Actual')
     accuracy2(i) = corr(feat_u2, adjusted_downsample2);
+    feat_pred2(i,:) = feat_u2;
 end
 %% Sub3 Feats Calculation
 Sub3_num_chan = size(test_ecog_3,2);
@@ -193,8 +196,8 @@ for i = 1:5
     downsampled_Sub3_dg_data = decimate(train_dg_3(:,i),2);
     adjusted_downsample3 = downsampled_Sub3_dg_data(1:length(new_X3));
 
-    feat_i3{i} = mldivide(new_X3'*new_X3,new_X3'*adjusted_downsample3);
-    feat_u3{i} = new_X3*feat_i3;
+    feat_i3 = mldivide(new_X3'*new_X3,new_X3'*adjusted_downsample3);
+    feat_u3 = new_X3*feat_i3;
 
     figure;
     plot(feat_u3)
@@ -203,39 +206,42 @@ for i = 1:5
     hold off
     title('Predicted vs Actual')
     legend('Predicted', 'Actual')
-    accuracy3(i) = corr(feat_u3{i}, adjusted_downsample3{i});
-    feat_pred3(i,:) = feat_u3{i};
+    accuracy3(i) = corr(feat_u3, adjusted_downsample3);
+    feat_pred3(i,:) = feat_u3;
 end
 %% Step 4 of Simple Method
 
 % Sub 1
 for i = 1:5
-    y1 = feat_u1(i);
-    x1 = 1:length(feat_u1{i});
-    xq1 = 1:1/50:length(feat_u1{i})+7; % +7 is to scale it up closer to the 147500
+    y1 = feat_pred1(i,:);
+    x1 = 1:length(feat_u1);
+    xq1 = 1:1/50:length(feat_u1)+7; % +7 is to scale it up closer to the 147500
 
-interp_pred1(i,:) = spline(feat_pred3(i,:), y1, xq1);
-new_interp_pred1(i,:) = interp_pred1(1:end-1);
+    interp_pred1 = spline(x1, y1, xq1);
+    new_interp_pred1(:,i) = interp_pred1(1:end-1);
 end
 
 % Sub 2
-y2 = feat_u2;
-x2 = 1:length(feat_u2);
-xq2 = 1:1/50:length(feat_u2)+7; % +7 is to scale it up closer to the 147500
+for i = 1:5
+    y2 = feat_pred2(i,:);
+    x2 = 1:length(feat_u2);
+    xq2 = 1:1/50:length(feat_u2)+7; % +7 is to scale it up closer to the 147500
 
-interp_pred2 = spline(x2, y2, xq2);
-new_interp_pred2 = interp_pred2(1:end-1);
+    interp_pred2 = spline(x2, y2, xq2);
+    new_interp_pred2(:,i) = interp_pred2(1:end-1);
+end
 
 % Sub 3
 for i = 1:5
-    y3 = feat_u3(i,:);
+    y3 = feat_pred3(i,:);
     x3 = 1:length(feat_u3);
     xq3 = 1:1/50:length(feat_u3)+7; % +7 is to scale it up closer to the 147500
 
     interp_pred3 = spline(x3, y3, xq3);
-    new_interp_pred3 = interp_pred3(1:end-1);
+    new_interp_pred3(:,i) = interp_pred3(1:end-1);
 end
 %% Storing all outputs
 predicted_dg{1} = new_interp_pred1;
 predicted_dg{2} = new_interp_pred2;
 predicted_dg{3} = new_interp_pred3;
+predicted_dg = predicted_dg';
