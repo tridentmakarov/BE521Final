@@ -1,16 +1,6 @@
 function [output] = calcMovement(sp, times, peak, offset, vari)
 
 
-% winLen = 1; %s
-% winDisp = 0.5; %s
-% LLFn = @(x) sum(abs(diff(x)));
-% % LLFn = @(x) mean(x);
-% sampleRate = 1000; %samples/s
-% ranges = [5, 15; 20, 25; 75, 115; 125, 160; 160, 175];
-% 
-% [LL, freq_mag, A, E, ZX, t_int] = MovingWinFeats(sp, sampleRate, winLen, winDisp, LLFn, ranges);
-% plot(LL)
-
 output = sp;
 barrier = 0;
 avg_time = round(mean(times));
