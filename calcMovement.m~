@@ -1,4 +1,4 @@
-function [output] = calcMovement(sp, times)
+function [output] = calcMovement(sp, times, peak, offset, vari)
 
 
 % winLen = 1; %s
@@ -12,17 +12,14 @@ function [output] = calcMovement(sp, times)
 % plot(LL)
 
 output = sp;
-barrier = 0.1;
+barrier = 0;
 avg_time = round(mean(times));
 
-figure()
-plot(sp)
-findpeaks(sp, 1, 'MinPeakProminence', std(sp)*3);
+
 [vals,locs] = findpeaks(sp, 1, 'MinPeakProminence', std(sp)*3);
 count = 0;
 dev = std(sp);
 m_val = max(sp)*4;
-offset = 0.4;
 
 count = inf;
 prev_loc = -inf;
@@ -38,6 +35,7 @@ while count > 20
 				locations(count) = loc;
 				values(count) = vals(i);
 				prev_loc = loc;
+				peaks_avg(count) = mean(sp(loc:length(sp)));
 			end
 		else
 			if mean(sp(loc:loc + avg_time)) > mean(sp) + barrier * dev...
@@ -46,37 +44,46 @@ while count > 20
 				locations(count) = loc;
 				values(count) = vals(i);
 				prev_loc = loc;
+				peaks_avg(count) = mean(sp(loc:loc + avg_time));
+			else
+				low_avg = [low_avg, 
 			end
 		end
 	end
-	barrier = barrier + 0.4;
+	barrier = barrier + 0.01;
 end
 
-for l = 1:length(locations)
+total_avg = mean(peaks_avg);
+for i = 1:length(locations)
 	locate = locations(i);
-	
 end
+
+peak_ratio = peak / mean(peaks_avg);
 
 pl = 0;
-hold on; plot(locations, values, 'o')
-% hold off;
-% figure()
-% hold on; plot(locations, values, 'o')
 while pl < length(sp)
 	pl = pl + 1;
 	if any(pl == locations)
 		if pl + avg_time > length(sp)
-			output(pl : length(sp)) = sp(pl : length(sp)) * 2;
+			output(pl : length(sp)) = sp(pl : length(sp)) * peak_ratio;
 		else
-			output(pl : pl + avg_time) = sp(pl : pl + avg_time) * 2;
+			output(pl : pl + avg_time) = sp(pl : pl + avg_time) * peak_ratio;
 			pl = pl + avg_time;
 		end
 	else
-		output(pl) = sp(pl)/m_val - offset;
+		output(pl) = sp(pl)/m_val + offset;
 	end
 end
 
 output(output < -dev) = -dev;
+
+% figure()
+% plot(sp)
+% findpeaks(sp, 1, 'MinPeakProminence', std(sp)*3);
+% hold on; plot(locations, values, 'o')
+% hold off;
+% figure()
+% hold on; plot(locations, values, 'o')
 
 end
 
