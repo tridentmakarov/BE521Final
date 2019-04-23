@@ -13,7 +13,7 @@ close all
 
 testing = false;
 show_plots = false;
-post_process = false;
+post_process = true;
 
 load('data/train_ecog_1.mat')
 load('data/train_dg_1.mat')
@@ -64,7 +64,7 @@ for set = 1:3
 	for i = 1:5
 		[move_times(i), finger_peaks(i) finger_offset(i), finger_variability(i)] = getFingerFeats(dg_train(:, i)); % Get times
 		temp = decimate(dg_train(:, i), 50); % Decimate to get Y matrix
-		Y(:, i) = temp(1:length(temp)-3); % Remove value
+		Y(:, i) = temp(3:length(temp)-3); % Remove value
 	end
 
 	%% Step 3: Linear regression
@@ -76,19 +76,19 @@ for set = 1:3
 		dataset = datasets{k}; % Easier using cell array, get data
 
 		M = size(dataset, 1); % Timepoints
-		N = 3; % Time Bins
+		N = 5; % Time Bins
 		v = size(dataset, 2); % Neurons
 
 		rows = M; % Timepoints minus 2 extra time values
 		cols = N * size(dataset, 2); % Neurons times features times 3 (for overlap)
-		R = zeros(rows - 2, cols); % Create matrix
-		one_col = ones(rows-2, 1); % Ones column
+		R = zeros(rows - 4, cols); % Create matrix
+		one_col = ones(rows-4, 1); % Ones column
 		% Run through each neuron (will be something like 62, 44, etc)
 		for i = 1 : v
 			% Run through each of the timepoints (will be something like 4999)
-			for j = 1 : M - 2
+			for j = 3 : M - 2
 				% Get the last three position values, for 150ms lag
-				R(j, :) = [dataset(j, :), dataset(j+1, :),  dataset(j+2, :)];
+				R(j, :) = [dataset(j-2, :),  dataset(j-1, :), dataset(j, :), dataset(j+1, :),  dataset(j+2, :)];
 			end
 		end
 		% Add to cell array
@@ -100,7 +100,7 @@ for set = 1:3
 	
 	% Calculate the Y matrix, and pad
 	Y_out = X{2} * B;
-% 	Y_B = [zeros(1, 5); Y_B ];
+	Y_B = [zeros(1, 5); zeros(1, 5); Y_B; zeros(1, 5); zeros(1, 5) ];
 % 	Y_testing = X * B;
 
 	% Test correlation
