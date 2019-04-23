@@ -12,6 +12,9 @@ close all
 % save('data/test_ecog_3.mat', 'test_ecog_3')
 
 
+testing = false;
+
+
 load('data/train_ecog_1.mat')
 load('data/train_dg_1.mat')
 load('data/test_ecog_1.mat')
@@ -24,46 +27,55 @@ load('data/train_ecog_3.mat')
 load('data/train_dg_3.mat')
 load('data/test_ecog_3.mat')
 
-ecog_sets = {train_ecog_1, train_ecog_2, train_ecog_3};
+
+% ecog_sets = {train_ecog_1, train_ecog_2, train_ecog_3};
 dg_sets = {train_dg_1, train_dg_2, train_dg_3};
-test_sets = {test_ecog_1, test_ecog_2, test_ecog_3};
+% test_sets = {test_ecog_1, test_ecog_2, test_ecog_3};
 
-testing = false;
 
+load('updated_features.mat')
+
+Sub1_lead_feat = permute(Sub1_lead_feat,[2 3 1]);
+Sub2_lead_feat = permute(Sub2_lead_feat,[2 3 1]);
+Sub3_lead_feat = permute(Sub3_lead_feat,[2 3 1]);
+
+ecog_sets = {Sub1_lead_feat, Sub2_lead_feat, Sub3_lead_feat};
 
 for set = 1:3
 	%% Step 1: Get features
-	fprintf('Getting features for person %d\n', set)
-	ecog_train = ecog_sets{set};
-	if testing == true
-		ecog_test = ecog_sets{set};
-	else
-		ecog_test = test_sets{set};
-	end
-
+% 	fprintf('Getting features for person %d\n', set)
+% 	ecog_train = ecog_sets{set};
+% 	if testing == true
+% 		ecog_test = ecog_sets{set};
+% 	else
+% 		ecog_test = test_sets{set};
+% 	end
+% 
 	dg_train = dg_sets{set};
-	dg_test = dg_sets{set};
+% 	dg_test = dg_sets{set};
 
 
-	filename_train = sprintf('features_train_%d.mat', set);
-	filename_test = sprintf('features_test_%d.mat', set);
-	
-	
-	if ~isfile(filename_train)
-		features_train = getFeatures(ecog_train);
-		fprintf('Saving file: %s\n', filename_train);
-		save(filename_train, 'features_train');
-	else
-		load(filename_train);
-	end
-	
-	if ~isfile(filename_test)
-		features_test = getFeatures(ecog_test);
-		fprintf('Saving file: %s\n', filename_test);
-		save(filename_test, 'features_test');
-	else
-		load(filename_test);
-	end
+% 	filename_train = sprintf('features_train_%d.mat', set);
+% 	filename_test = sprintf('features_test_%d.mat', set);
+% 	
+% 	
+% 	if ~isfile(filename_train)
+% 		features_train = getFeatures(ecog_train);
+% 		fprintf('Saving file: %s\n', filename_train);
+% 		save(filename_train, 'features_train');
+% 	else
+% 		load(filename_train);
+% 	end
+% 	
+% 	if ~isfile(filename_test)
+% 		features_test = getFeatures(ecog_test);
+% 		fprintf('Saving file: %s\n', filename_test);
+% 		save(filename_test, 'features_test');
+% 	else
+% 		load(filename_test);
+% 	end
+
+	features_train = ecog_sets{set};
 
 	%% Step 2: Decimate
 	disp('Decimating')
@@ -80,48 +92,44 @@ for set = 1:3
 
 	%% Step 3: Linear regression
 	disp('Performing regression')
-	datasets = {features_train, features_test}; % Easier using cell array
+	dataset = features_train; % Easier using cell array, get data
 
-	for k = 1:2
-		dataset = datasets{k}; % Get data
+	M = size(dataset, 1); % Timepoints
+	N = size(dataset, 2); % Time Bins
+	v = size(dataset, 3); % Neurons
 
-		M = size(dataset, 1); % Timepoints
-		N = size(dataset, 2); % Time Bins
-		v = size(dataset, 3); % Neurons
+	rows = M-2; % Timepoints minus 2 extra time values
+	cols = N * v * 3; % Neurons times features times 3 (for overlap)
+	R = ones(rows, cols); % Create matrix
+	one_col = ones(rows, 1); % Ones column
 
-		rows = M-2; % Timepoints minus 2 extra time values
-		cols = N * v * 3; % Neurons times features times 3 (for overlap)
-		R = ones(rows, cols); % Create matrix
-		one_col = ones(rows, 1); % Ones column
+	% Run through each neuron (will be something like 62, 44, etc)
+	for i = 1 : v
+		data = squeeze(dataset(:, :, i)); % Remove extra dimension
 
-		% Run through each neuron (will be something like 62, 44, etc)
-		for i = 1 : v
-			data = squeeze(dataset(:, :, i)); % Remove extra dimension
-
-			% Run through each of the timepoints (will be something like 4999)
-			for j = 3 : M
-				% Get the last three position values, for 150ms lag
-				R(j-2, (i-1)*N*3+1 : i*N*3) = [data(j-2, :),  data(j-1, :), data(j, :)];
-			end
+		% Run through each of the timepoints (will be something like 4999)
+		for j = 3 : M
+			% Get the last three position values, for 150ms lag
+			R(j-2, (i-1)*N*3+1 : i*N*3) = [data(j-2, :),  data(j-1, :), data(j, :)];
 		end
-
-		% Add to cell array
-		X{k} = [one_col, R];
-
 	end
 
+	% Add to cell array
+	X = [one_col, R];
+
+
 	% Ensure the Y matrices are the right sizes for calculation
-	Y_train = Y(1:size(X{1}, 1), :);
+	Y_train = Y(1:size(X, 1), :);
 	if testing == true
 		Y_test = Y_test(1:size(X{2}, 1), :);
 	end
 
 	% Create the B matrix
-	B = inv(X{1}' * X{1}) * X{1}' * Y_train;
-	Y_B = X{2} * B;
+	B = inv(X' * X) * X' * Y_train;
+	Y_B = X * B;
 	Y_B = [Y_B(1, :); Y_B(1, :); Y_B; Y_B(size(Y_B, 1),:)];
 	
-	Y_testing = X{1} * B;
+	Y_testing = X * B;
 
 	% Test correlation
 	correlation = corr(Y_testing(:, 1), Y_train(:, 1));
@@ -134,13 +142,13 @@ for set = 1:3
 	for i = 1:5
 		y = Y_B(:, i); % Get y value of finger
 		x = 1:length(y); % Get x values of finger
-		xq1 = 1:1/50:length(y)+1; % Interpolate positions
+		xq1 = 1:1/50:length(y)+2; % Interpolate positions
 		xq1 = xq1(1:size(test_ecog_1, 1));
 		sp(i, :) = spline(x,y,xq1); % Spline
 
 		res(i, :) = calcMovement(sp(i, :), move_times);
 
-		if testing == true % Run if testing
+% 		if testing == true % Run if testing
 			c(i) = corr(res(i, :)', dg_train(1:length(sp(i, :)), i));
 
 			figure()
@@ -149,7 +157,7 @@ for set = 1:3
 			plot(dg_train(1:length(sp(i, :)), i), '--');
 			legend('calculated', 'actual')
 			hold off
-		end
+% 		end
 	end
 	if testing == false
 		predicted_dg{set} = res(:, 1:size(test_ecog_1, 1))';

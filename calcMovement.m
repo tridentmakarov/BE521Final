@@ -12,11 +12,10 @@ function [output] = calcMovement(sp, times)
 % plot(LL)
 
 output = sp;
-barrier = 0.1;
+barrier = 0;
 avg_time = round(mean(times));
 
-% plot(sp)
-findpeaks(sp, 1, 'MinPeakProminence', std(sp)*3);
+
 [vals,locs] = findpeaks(sp, 1, 'MinPeakProminence', std(sp)*3);
 count = 0;
 dev = std(sp);
@@ -26,7 +25,7 @@ offset = 0.4;
 count = inf;
 prev_loc = -inf;
 
-while count > 30
+while count > 20
 	count = 0;
 	for i = 1:length(locs)
 		loc = locs(i);
@@ -37,6 +36,7 @@ while count > 30
 				locations(count) = loc;
 				values(count) = vals(i);
 				prev_loc = loc;
+				avg_store(count) = mean(sp(loc:length(sp)));
 			end
 		else
 			if mean(sp(loc:loc + avg_time)) > mean(sp) + barrier * dev...
@@ -45,12 +45,22 @@ while count > 30
 				locations(count) = loc;
 				values(count) = vals(i);
 				prev_loc = loc;
+				avg_store(count) = mean(sp(loc:loc + avg_time));
 			end
 		end
 	end
-	barrier = barrier + 0.4;
+	barrier = barrier + 0.01;
 end
+
+total_avg = mean(avg_store);
+for i = 1:length(locations)
+	locate = locations(i);
+end
+
 pl = 0;
+% figure()
+% plot(sp)
+% findpeaks(sp, 1, 'MinPeakProminence', std(sp)*3);
 % hold on; plot(locations, values, 'o')
 % hold off;
 % figure()
