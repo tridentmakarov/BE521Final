@@ -12,13 +12,13 @@ function [LL, freq_mag, A, E, ZX, time] = MovingWinFeats(x, fs, winLen, winDisp,
 	x_0 = 1;
 	
 	NumWins = ((length(x)/fs)/winDisp)-1;
-	ni = rem((length(x)/fs - winLen), winDisp);
+% 	ni = rem((length(x)/fs - winLen), winDisp);
 	
 	%Three extra features
-	area = @(x) sum(abs(x)); %Area
-	energy = @(x) sum(x.^2); %Energy
-	zx = @(x) sum(and(x(2:length(x)) - mean(x) > 0,...
-		x(1:length(x)-1) - mean(x) < 0)); %Crossings
+% 	area = @(x) sum(abs(x)); %Area
+% 	energy = @(x) sum(x.^2); %Energy
+% 	zx = @(x) sum(and(x(2:length(x)) - mean(x) > 0,...
+% 		x(1:length(x)-1) - mean(x) < 0)); %Crossings
 	
 	
 	for i = 1:NumWins
@@ -35,9 +35,9 @@ function [LL, freq_mag, A, E, ZX, time] = MovingWinFeats(x, fs, winLen, winDisp,
 		end
 		
 		%Extra features calculations
-		A(i) = area(x_i);
-		E(i) = energy(x_i);
-		ZX(i) = zx(x_i);
+% 		A(i) = area(x_i);
+% 		E(i) = energy(x_i);
+% 		ZX(i) = zx(x_i);
 		
 		x_0 = x_0 + winOffset;
 	end

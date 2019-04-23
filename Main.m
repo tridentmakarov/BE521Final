@@ -88,7 +88,7 @@ for set = 1:3
 			% Run through each of the timepoints (will be something like 4999)
 			for j = 3 : M - 2
 				% Get the last three position values, for 150ms lag
-				R(j, :) = [dataset(j-2, :),  dataset(j-1, :), dataset(j, :), dataset(j+1, :),  dataset(j+2, :)];
+				R(j-2, :) = [dataset(j-2, :),  dataset(j-1, :), dataset(j, :), dataset(j+1, :),  dataset(j+2, :)];
 			end
 		end
 		% Add to cell array
@@ -100,7 +100,7 @@ for set = 1:3
 	
 	% Calculate the Y matrix, and pad
 	Y_out = X{2} * B;
-	Y_B = [zeros(1, 5); zeros(1, 5); Y_B; zeros(1, 5); zeros(1, 5) ];
+	Y_out = [zeros(1, 5); zeros(1, 5); Y_out; zeros(1, 5); zeros(1, 5) ];
 % 	Y_testing = X * B;
 
 	% Test correlation
