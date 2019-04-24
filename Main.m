@@ -11,7 +11,7 @@ close all
 % test_ecog_3 = test_ecog_3(1:remove_pos-1, :);
 % save('data/test_ecog_3.mat', 'test_ecog_3')
 
-testing = false;
+testing = true;
 show_plots = false;
 post_process = true;
 
@@ -38,13 +38,13 @@ for set = 1:3
         ecog_train = ecog_sets{set};
         dg_train = dg_sets{set};
         ecog_test = test_sets{set};
-        predicted_dg{set} = AllSteps(ecog_train, dg_train, ecog_test, show_plots, post_process, set, testing);
+        predicted_dg{set} = AllSteps(ecog_train, dg_train, ecog_test, show_plots, post_process, set, 0, testing);
 
     else
         ecog_full = ecog_sets{set};
         
         n_cross = 10;
-        percent_data = 0.1;
+        percent_data = 1;
         all_pos = linspace(0, size(ecog_full, 1)*percent_data, n_cross + 1);
         shift = [all_pos(length(all_pos)), all_pos(1: length(all_pos) - 1)];
         stack = [shift; all_pos];
@@ -61,8 +61,8 @@ for set = 1:3
             ecog_train = ecog_sets{set}(train_pos, :);
             dg_train = dg_sets{set}(train_pos, :);
             ecog_test = ecog_sets{set}(test_pos, :);
-            accuracy = AllSteps(ecog_train, dg_train, ecog_test, show_plots, post_process, set, testing);
-            fprintf('Accuracy: %.3d\n', accuracy)
+            accuracy(set, pc) = AllSteps(ecog_train, dg_train, ecog_test, show_plots, post_process, set, pc, testing);
+            fprintf('Accuracy for val %d: %.3d\n', pc, accuracy(set, pc))
         end
     end
 end
