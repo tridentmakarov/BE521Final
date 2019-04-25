@@ -12,20 +12,31 @@ barrier = 2;
 avg_time = round(mean(times));
 
 
-[vals,locs] = findpeaks(sp, 1, 'MinPeakProminence', std(sp)*2);
+% [vals,locs] = findpeaks(sp, 1, 'MinPeakProminence', std(sp)*2);
 dev = std(sp);
 
 winLen = 2; %s
 winDisp = 1; %s
-% LLFn = @(x) sum(abs(diff(x)));
-LLFn = @(x) mean(x);
 sampleRate = 1000; %samples/s
 ranges = [5, 15; 20, 25; 75, 115; 125, 160; 160, 175];
 
-[LL, ~, ~] = MovingWinFeats(sp, sampleRate, winLen, winDisp, LLFn, ranges);
-[~,locations] = findpeaks(LL, 1, 'MinPeakProminence', std(LL)*2);
-% plot(LL)
+[~, ~, M] = MovingWinFeats(sp, sampleRate, winLen, winDisp, ranges);
+[~,locations] = findpeaks(M, 1, 'MinPeakProminence', std(M)*2);
+% findpeaks(LL, 1, 'MinPeakProminence', std(LL)*2);
+
 locations = locations * 1000;
+locations(locations < 1) = 1;
+
+% plot_locs = [];
+% for i = 1:length(locations)
+% 	plot_locs = [plot_locs, locations(i):locations(i) + times];
+% end
+% 
+% figure()
+% plot(sp)
+% hold on
+% plot(plot_locs, sp(plot_locs), 'or')
+% hold off
 
 sp(sp > mean(sp) + 4 * std(sp)) = mean(sp);
 sp(sp < mean(sp) - 4 * std(sp)) = mean(sp);
@@ -61,16 +72,16 @@ high_pos = reshape(high_pos, [], r*c);
 high_pos(high_pos > length(sp)) = [];
 low_pos(high_pos) = [];
 
-windowSize1 = 1000; % TEST
-windowSize2 = 200; % TEST
+windowSize1 = 500; % TEST
+% windowSize2 = 200; % TEST
 b1 = (1/windowSize1)*ones(1,windowSize1);
-b2 = (1/windowSize2)*ones(1,windowSize2);
+% b2 = (1/windowSize2)*ones(1,windowSize2);
 a = 1;
 
 sp(low_pos) = sp(low_pos) * m_val + offset;
 sp(low_pos) = filtfilt(b1,a,sp(low_pos));
 sp(high_pos) = sp(high_pos) * peak_ratio;
-sp(high_pos) = filtfilt(b2,a,sp(high_pos));
+% sp(high_pos) = filtfilt(b2,a,sp(high_pos));
 
 plot(stored_plot)
 hold on
