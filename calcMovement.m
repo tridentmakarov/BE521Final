@@ -40,7 +40,7 @@ locations(locations < 1) = 1;
 
 sp(sp > mean(sp) + 4 * std(sp)) = mean(sp);
 sp(sp < mean(sp) - 4 * std(sp)) = mean(sp);
-
+peaks_max = [];
 for i = 1:length(locations)
 	loc = locations(i);
 	if loc + avg_time > length(sp)
@@ -59,18 +59,21 @@ end
 % for i = 1:length(locations)
 % 	locate = locations(i);
 % end
-
-peak_ratio = peak / mean(peaks_max);
-m_val = vari/dev/3;
-
 low_pos = 1:length(sp);
-for i = 1:length(locations)
-	high_pos(i, :) = locations(i):locations(i) + avg_time;
+m_val = vari/dev/3;
+if ~isempty(peaks_max)
+	peak_ratio = peak / mean(peaks_max);
+
+
+	for i = 1:length(locations)
+		high_pos(i, :) = locations(i):locations(i) + avg_time;
+	end
+	[r, c] = size(high_pos);
+	high_pos = reshape(high_pos, [], r*c);
+	high_pos(high_pos > length(sp)) = [];
+	low_pos(high_pos) = [];	
+	sp(high_pos) = sp(high_pos) * peak_ratio;
 end
-[r, c] = size(high_pos);
-high_pos = reshape(high_pos, [], r*c);
-high_pos(high_pos > length(sp)) = [];
-low_pos(high_pos) = [];
 
 windowSize1 = 500; % TEST
 % windowSize2 = 200; % TEST
@@ -80,14 +83,13 @@ a = 1;
 
 sp(low_pos) = sp(low_pos) * m_val + offset;
 sp(low_pos) = filtfilt(b1,a,sp(low_pos));
-sp(high_pos) = sp(high_pos) * peak_ratio;
 % sp(high_pos) = filtfilt(b2,a,sp(high_pos));
 
-plot(stored_plot)
-hold on
-plot(sp)
-legend('unfiltered, filtered')
-hold off
+% plot(stored_plot)
+% hold on
+% plot(sp)
+% legend('unfiltered, filtered')
+% hold off
 
 output = sp;
 
