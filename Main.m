@@ -11,7 +11,7 @@ close all
 % test_ecog_3 = test_ecog_3(1:remove_pos-1, :);
 % save('data/test_ecog_3.mat', 'test_ecog_3')
 
-testing = true;
+cross_testing = false;
 show_plots = false;
 post_process = true;
 
@@ -34,11 +34,12 @@ test_sets = {test_ecog_1, test_ecog_2, test_ecog_3};
 
 for set = 1:3
     fprintf('Getting features for person %d\n', set)
-    if testing == false            
+    if cross_testing == false            
         ecog_train = ecog_sets{set};
         dg_train = dg_sets{set};
         ecog_test = test_sets{set};
-        predicted_dg{set} = AllSteps(ecog_train, dg_train, ecog_test, show_plots, post_process, set, 0, testing);
+		
+        predicted_dg{set} = AllSteps(ecog_train, dg_train, ecog_test, show_plots, post_process, set, 0, cross_testing);
 
     else
         ecog_full = ecog_sets{set};
@@ -61,13 +62,14 @@ for set = 1:3
             ecog_train = ecog_sets{set}(train_pos, :);
             dg_train = dg_sets{set}(train_pos, :);
             ecog_test = ecog_sets{set}(test_pos, :);
-            accuracy(set, pc) = AllSteps(ecog_train, dg_train, ecog_test, show_plots, post_process, set, pc, testing);
+			
+            accuracy(set, pc) = AllSteps(ecog_train, dg_train, ecog_test, show_plots, post_process, set, pc, cross_testing);
             fprintf('Accuracy for val %d: %.3d\n', pc, accuracy(set, pc))
         end
     end
 end
 
-if testing == false
+if cross_testing == false
     disp('Finished! Outputting predicted_dg');
     save('predicted_dg.mat', 'predicted_dg'); 
 end

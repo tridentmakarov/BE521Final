@@ -1,79 +1,84 @@
-function [output] = calcMovement(sp, times, peak, offset, vari)
+function [output] = calcMovement(sp, fingerFeats, f_i)
+
+times = fingerFeats.move_times(f_i);
+peak = fingerFeats.finger_peaks(f_i);
+offset = fingerFeats.finger_offset(f_i);
+vari = fingerFeats.finger_variability(f_i);
+n_peaks = fingerFeats.n_peaks(f_i);
 
 
-output = sp;
-barrier = 0;
+stored_plot = sp;
+barrier = 2;
 avg_time = round(mean(times));
 
 
-[vals,locs] = findpeaks(sp, 1, 'MinPeakProminence', std(sp)*3);
-count = 0;
+[vals,locs] = findpeaks(sp, 1, 'MinPeakProminence', std(sp)*2);
 dev = std(sp);
 
-count = inf;
-prev_loc = -inf;
+winLen = 2; %s
+winDisp = 1; %s
+% LLFn = @(x) sum(abs(diff(x)));
+LLFn = @(x) mean(x);
+sampleRate = 1000; %samples/s
+ranges = [5, 15; 20, 25; 75, 115; 125, 160; 160, 175];
 
-sp(find(sp > mean(sp) + 6 * std(sp))) = mean(sp);
+[LL, ~, ~] = MovingWinFeats(sp, sampleRate, winLen, winDisp, LLFn, ranges);
+[~,locations] = findpeaks(LL, 1, 'MinPeakProminence', std(LL)*2);
+% plot(LL)
+locations = locations * 1000;
 
-while count > 20
-	count = 0;
-	for i = 1:length(locs)
-		loc = locs(i);
-		if loc + avg_time > length(sp)
-			if mean(sp(loc:length(sp))) > mean(sp) + barrier * dev &&...
-					loc - prev_loc  > avg_time
-				count = count + 1;
-				locations(count) = loc;
-				values(count) = vals(i);
-				prev_loc = loc;
-				peaks_max(count) = max(sp(loc:length(sp)));
-			end
-		else
-			if mean(sp(loc:loc + avg_time)) > mean(sp) + barrier * dev...
-					&& loc - prev_loc  > avg_time
-				count = count + 1;
-				locations(count) = loc;
-				values(count) = vals(i);
-				prev_loc = loc;
-				peaks_max(count) = max(sp(loc:loc + avg_time));
-			end
-		end
-	end
-	barrier = barrier + 0.01;
-end
+sp(sp > mean(sp) + 4 * std(sp)) = mean(sp);
+sp(sp < mean(sp) - 4 * std(sp)) = mean(sp);
 
-total_avg = mean(peaks_max);
 for i = 1:length(locations)
-	locate = locations(i);
+	loc = locations(i);
+	if loc + avg_time > length(sp)
+		peaks_max(i) = max(sp(loc:length(sp)));
+	else
+		peaks_max(i) = max(sp(loc:loc + avg_time));
+	end
 end
+
+% plot(sp)
+% hold on
+% plot(locations, values, 'or')
+% hold off
+
+% total_avg = mean(peaks_max);
+% for i = 1:length(locations)
+% 	locate = locations(i);
+% end
 
 peak_ratio = peak / mean(peaks_max);
-m_val = vari/std(sp);
+m_val = vari/dev/3;
 
-pl = 0;
-while pl < length(sp)
-	pl = pl + 1;
-	if any(pl == locations)
-		if pl + avg_time > length(sp)
-			output(pl : length(sp)) = sp(pl : length(sp)) * peak_ratio;
-		else
-			output(pl : pl + avg_time) = sp(pl : pl + avg_time) * peak_ratio;
-			pl = pl + avg_time;
-		end
-	else
-		output(pl) = sp(pl)*m_val + offset;
-	end
+low_pos = 1:length(sp);
+for i = 1:length(locations)
+	high_pos(i, :) = locations(i):locations(i) + avg_time;
 end
+[r, c] = size(high_pos);
+high_pos = reshape(high_pos, [], r*c);
+high_pos(high_pos > length(sp)) = [];
+low_pos(high_pos) = [];
 
-% output(output < -dev) = -dev;
+windowSize1 = 1000; % TEST
+windowSize2 = 200; % TEST
+b1 = (1/windowSize1)*ones(1,windowSize1);
+b2 = (1/windowSize2)*ones(1,windowSize2);
+a = 1;
 
-% figure()
-% plot(sp)
-% findpeaks(sp, 1, 'MinPeakProminence', std(sp)*3);
-% hold on; plot(locations, values, 'o')
-% hold off;
-% figure()
-% hold on; plot(locations, values, 'o')
+sp(low_pos) = sp(low_pos) * m_val + offset;
+sp(low_pos) = filtfilt(b1,a,sp(low_pos));
+sp(high_pos) = sp(high_pos) * peak_ratio;
+sp(high_pos) = filtfilt(b2,a,sp(high_pos));
+
+plot(stored_plot)
+hold on
+plot(sp)
+legend('unfiltered, filtered')
+hold off
+
+output = sp;
 
 end
 

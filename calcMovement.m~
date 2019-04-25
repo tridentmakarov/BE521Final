@@ -1,0 +1,82 @@
+function [output] = calcMovement(sp, fingerFeats, f_i)
+
+times = fingerFeats.move_times(f_i);
+peak = fingerFeats.finger_peaks(f_i);
+offset = fingerFeats.finger_offset(f_i);
+vari = fingerFeats.finger_variability(f_i);
+n_peaks = fingerFeats.n_peaks(f_i);
+
+windowSize = 1000; % TEST
+output = sp;
+barrier = 2;
+avg_time = round(mean(times));
+
+
+[vals,locs] = findpeaks(sp, 1, 'MinPeakProminence', std(sp)*2);
+count = 0;
+dev = std(sp);
+
+winLen = 2; %s
+winDisp = 1; %s
+% LLFn = @(x) sum(abs(diff(x)));
+LLFn = @(x) mean(x);
+sampleRate = 1000; %samples/s
+ranges = [5, 15; 20, 25; 75, 115; 125, 160; 160, 175];
+
+[LL, ~, ~] = MovingWinFeats(sp, sampleRate, winLen, winDisp, LLFn, ranges);
+[~,locations] = findpeaks(LL, 1, 'MinPeakProminence', std(LL)*2);
+% plot(LL)
+locations = locations * 1000;
+
+sp(sp > mean(sp) + 4 * std(sp)) = mean(sp);
+sp(sp < mean(sp) - 4 * std(sp)) = mean(sp);
+
+for i = 1:length(locations)
+	loc = locations(i);
+	if loc + avg_time > length(sp)
+		peaks_max(i) = max(sp(loc:length(sp)));
+	else
+		peaks_max(i) = max(sp(loc:loc + avg_time));
+	end
+end
+
+% plot(sp)
+% hold on
+% plot(locations, values, 'or')
+% hold off
+
+% total_avg = mean(peaks_max);
+% for i = 1:length(locations)
+% 	locate = locations(i);
+% end
+
+peak_ratio = peak / mean(peaks_max);
+m_val = vari/std(sp)/3;
+
+low_pos = 1:length(sp);
+for i = 1:length(locations)
+	high_pos(i, :) = locations(i):locations(i) + avg_time;
+end
+[r, c] = size(high_pos);
+high_pos = reshape(high_pos, [], r*c);
+high_pos(high_pos > length(sp)) = [];
+low_pos(high_pos) = [];
+
+b = (1/windowSize)*ones(1,windowSize);
+a = 1;
+
+test_sp = filtfilt(b,a,sp);
+sp(low_pos) = sp(low_pos) * m_val + offset;
+sp(low_pos) = filtfilt(b,a,sp(low_pos));
+sp(high_pos) = sp(high_pos) * peak_ratio;
+
+plot(test_sp)
+hold on
+plot(sp)
+legend('unfiltered, filtered')
+hold off
+
+output = sp;
+
+end
+

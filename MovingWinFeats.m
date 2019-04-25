@@ -29,11 +29,13 @@ function [LL, freq_mag, A] = MovingWinFeats(x, fs, winLen, winDisp, featFn, rang
 		LL(i) = featFn(x_i);
 		
 % 		[s, f, ~] = spectrogram(x_i);
-        [s, f, ~] = spectrogram(x_i,100);
-		f = f/pi*180;
+%         [s, f, ~] = spectrogram(x_i,100);
+		[s1, f1, ~] = spectrogram(x_i,100,50,[5:15,20:25,75:115,125:160,160:175],1000);
+% 		f = f/pi*180;
 		for j = 1:5
 % 			freq_mag(i, j) = abs(mean(mean(s(f > ranges(j,1) & f < ranges(j, 2), :))));
-			freq_mag(i, j) = abs(mean(s(f > ranges(j,1) & f < ranges(j, 2))));
+% 			freq_mag(i, j) = abs(mean(s(f > ranges(j,1) & f < ranges(j, 2))));
+			freq_mag(i, j) = abs(mean(s1(f1 >= ranges(j,1) & f1 <= ranges(j, 2))));
 		end
 		
 		%Extra features calculations
