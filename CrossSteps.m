@@ -5,10 +5,11 @@ function output = CrossSteps(ecog_train, dg_train, show_plots, post_process, set
 	vals = 0:size(ecog_train, 1)/nc:size(ecog_train, 1);
 	vals2 = vals(2:length(vals));
 	vals = vals(1:length(vals)-1) + 1;
-	trainset = 1:size(ecog_train, 1);
 	
 	for i = 1:nc
+		
 		fprintf('Cross validation %d\n', i)
+		trainset = 1:size(ecog_train, 1);
 		testset = vals(i):vals2(i);
 		trainset(testset) = [];
 		ecog_train_vals = ecog_train(trainset, :);

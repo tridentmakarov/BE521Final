@@ -16,7 +16,7 @@ function [output] = getFeatures(train_data)
 
 		[LL, freq_mag, M, A, ZX] = MovingWinFeats(set, sampleRate, winLen, winDisp, ranges);
 
-		output = [output, LL', ZX', M', freq_mag];
+		output = [output, LL', A', ZX', M', freq_mag];
 	end
 end
 

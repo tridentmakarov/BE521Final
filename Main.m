@@ -40,11 +40,11 @@ for set = 1:3
     if nc == 0       
         predicted_dg{set} = AllSteps(ecog_train, dg_train, ecog_test, show_plots, post_process, set);
 	else
-		accuracy(set) = CrossSteps(ecog_train, dg_train, show_plots, post_process, set, nc);
+		accuracy{set} = CrossSteps(ecog_train, dg_train, show_plots, post_process, set, nc);
     end
 end
 
-if nc == false
+if nc == 0
     disp('Finished! Outputting predicted_dg');
     save('predicted_dg.mat', 'predicted_dg'); 
 end
