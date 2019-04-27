@@ -5,7 +5,7 @@ function [times, peaks, finger_offset, finger_variability, n_peaks] = getFingerF
 	sampleRate = 1000; %samples/s
 	ranges = [5, 15; 20, 25; 75, 115; 125, 160; 160, 175];
 
-	[LL, ~, ~] = MovingWinFeats(vals, sampleRate, winLen, winDisp, ranges);
+	[LL, ~, ~, ~] = MovingWinFeats(vals, sampleRate, winLen, winDisp, ranges);
 
 	[~,~,w,~] = findpeaks(LL, 2, 'MinPeakProminence', max(LL)/2);
 

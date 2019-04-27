@@ -1,4 +1,4 @@
-function [Y_out] = Step3LinearRegression(Y_in, datasets)
+function [Y_out] = Step3LinearRegression(Y_set, datasets)
 %UNTITLED2 Summary of this function goes here
 %   Detailed explanation goes here
 	disp('Performing regression')
@@ -27,17 +27,12 @@ function [Y_out] = Step3LinearRegression(Y_in, datasets)
 		% Add to cell array
 		X{k} = [one_col, R];
 	end
-
+	
 	% Create the B matrix
-	B = mldivide(X{1}' * X{1}, X{1}' * Y_in);
+	B = mldivide(X{1}' * X{1}, X{1}' * Y_set);
 
 	% Calculate the Y matrix, and pad
 	Y_out = X{2} * B;
 	Y_out = [zeros(1, 5); zeros(1, 5); Y_out; zeros(1, 5); zeros(1, 5) ];
-	% 	Y_testing = X * B;
-
-	% Test correlation
-	% 	correlation = corr(Y_testing(:, 1), Y_train(:, 1));
-	% 	fprintf('Finger 1 testing correlation of %.2f\n', correlation);
 end
 
