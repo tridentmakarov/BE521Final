@@ -1,4 +1,4 @@
-function [Y_out] = Step3LinearRegression(Y_in, datasets)
+function [Y_out, Y_compare] = Step3LinearRegression(Y_in, datasets)
 %UNTITLED2 Summary of this function goes here
 %   Detailed explanation goes here
 	disp('Performing regression')
@@ -33,7 +33,9 @@ function [Y_out] = Step3LinearRegression(Y_in, datasets)
 
 	% Calculate the Y matrix, and pad
 	Y_out = X{2} * B;
+	Y_compare = X{1} * B;
 	Y_out = [zeros(1, 5); zeros(1, 5); Y_out; zeros(1, 5); zeros(1, 5) ];
+	Y_compare = [zeros(1, 5); zeros(1, 5); Y_compare; zeros(1, 5); zeros(1, 5) ];
 	% 	Y_testing = X * B;
 
 	% Test correlation
