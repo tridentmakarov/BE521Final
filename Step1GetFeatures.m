@@ -22,11 +22,22 @@ function [output] = getFeatures(train_data, pre_process)
 %   Detailed explanation goes here
 % 	times = linspace(0, size(train_mini_dg, 1)*1000/1E6, size(train_mini_dg, 1))';
 
+	limit = 4;
+
 	if pre_process == true
-		windowSize1 = 20; % TEST
-		b1 = (1/windowSize1)*ones(1,windowSize1);
-		a = 1;
-		train_data = filtfilt(b1,a,train_data);
+		dev = mean(std(train_data));
+		avg = mean(mean(train_data));
+		
+		
+		
+		for i = 1:size(train_data, 2)
+			low_locs = find(train_data(:, i) < avg - limit * dev);
+			high_locs = find(train_data(:, i) > avg + limit * dev);
+			train_data(low_locs, i) = avg - limit * dev;
+			train_data(high_locs, i) = avg + limit * dev;
+		end
+		figure()
+		plot(train_data(:, i))
 	end
 
 	winLen = 0.1; %s
@@ -40,9 +51,9 @@ function [output] = getFeatures(train_data, pre_process)
 
 		set = train_data(:, i);
 
-		[LL, freq_mag, M, ZX] = MovingWinFeats(set, sampleRate, winLen, winDisp, ranges);
+		[LL, freq_mag, M, A] = MovingWinFeats(set, sampleRate, winLen, winDisp, ranges);
 
-		output = [output, LL', M', freq_mag];
+		output = [output, LL', M', A', freq_mag];
 	end
 end
 

@@ -3,9 +3,6 @@ function [output] = Step4Interpolation(dg_train, Y_in, Y_compare, ecog_test, fin
 %   Detailed explanation goes here
 % Run through each finger
 	disp('Interpolating the finger positions')
-	if show_plots == true % Run if testing
-		figure()
-	end
 	for i = 1:5
 		y = Y_in(:, i); % Get y value of finger
 		y_c = Y_compare(:, i); % Get y value of finger
@@ -15,7 +12,7 @@ function [output] = Step4Interpolation(dg_train, Y_in, Y_compare, ecog_test, fin
 		xq_c = (1:(0.050*1000*(length(y_c)+3)))/(0.05*1000);
 		sp(i, :) = spline(x,y,xq); % Spline
 		sp_c(i, :) = spline(x_c,y_c,xq_c); % Spline
-		sp_c_store = sp_c(i, :);
+		sp_store = sp(i, :);
 
 		%% Post-process
 		if post_process == true
@@ -28,14 +25,14 @@ function [output] = Step4Interpolation(dg_train, Y_in, Y_compare, ecog_test, fin
 		
 		%% Plot
 		if show_plots == true % Run if testing
-
+			figure()
 			hold on
 % 			plot(sp_c_store)
-			subplot(1, 5, i)
-			plot(sp_c(i, 1:size(dg_train, 1)))
-			plot(dg_train(:, i), '--');
+% 			subplot(1, 5, i)
+			plot(sp_store)
+			plot(sp(i, :), '--');
 % 			legend('before PP', 'calculated', 'actual')
-			legend('calculated', 'actual')
+			legend('before', 'after')
 			hold off
 			pause(0.1)
 		end

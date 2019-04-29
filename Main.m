@@ -6,7 +6,7 @@ close all
 
 show_plots = false; % Shows the post-process comparison
 post_process = true; % Use post-processing. Very important!
-pre_process = false; % Use pre-processing WIP: KINDA SUCKS
+pre_process = true; % Use pre-processing 
 
 load('data/train_ecog_1.mat')
 load('data/train_dg_1.mat')

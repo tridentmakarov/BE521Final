@@ -1,4 +1,4 @@
-function [LL, freq_mag, M, ZX] = MovingWinFeats(x, fs, winLen, winDisp, ranges)
+function [LL, freq_mag, M, A] = MovingWinFeats(x, fs, winLen, winDisp, ranges)
 	% Inputs:
 		% x: signal
 		% fs: signal frequency (Hz)
@@ -23,10 +23,10 @@ function [LL, freq_mag, M, ZX] = MovingWinFeats(x, fs, winLen, winDisp, ranges)
 % 	ni = rem((length(x)/fs - winLen), winDisp);
 	
 	%Three extra features
-% 	area = @(x) sum(abs(x)); %Area
+	area = @(x) sum(abs(x)); %Area
 % 	energy = @(x) sum(x.^2); %Energy
-	zx = @(x) sum(and(x(2:length(x)) - mean(x) > 0,...
-		x(1:length(x)-1) - mean(x) < 0)); %Crossings
+% 	zx = @(x) sum(and(x(2:length(x)) - mean(x) > 0,...
+% 		x(1:length(x)-1) - mean(x) < 0)); %Crossings
 	
 	
 	for i = 1:NumWins
@@ -43,9 +43,9 @@ function [LL, freq_mag, M, ZX] = MovingWinFeats(x, fs, winLen, winDisp, ranges)
 		end
 		
 		%Extra features calculations
-% 		A(i) = area(x_i);
+		A(i) = area(x_i);
 % 		E(i) = energy(x_i);
-		ZX(i) = zx(x_i);
+% 		ZX(i) = zx(x_i);
 		
 		x_0 = x_0 + winOffset;
 	end
