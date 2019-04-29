@@ -35,12 +35,12 @@ for set = 1:3
 end
 
 %% Output plots, for visual
-for i = 1:length(predicted_dg)
-	for j = 1:5
-		figure()
-		plot(predicted_dg{i}(:, j))
-	end
-end
+% for i = 1:length(predicted_dg)
+% 	for j = 1:5
+% 		figure()
+% 		plot(predicted_dg{i}(:, j))
+% 	end
+% end
 %% Save predicted_dg.mat
 disp('Finished! Outputting predicted_dg');
 save('predicted_dg.mat', 'predicted_dg'); 
