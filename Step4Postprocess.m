@@ -103,7 +103,9 @@ for i = 1:roll_size:length(low_pos)
 	offset = mean(sp(low_pos(pos_r)));
 	vari_ratio = vari / new_vari;
 	sp(low_pos(pos_r)) = (sp(low_pos(pos_r)) - offset)*vari_ratio + offset;
-	sp(low_pos(pos_r)) = filtfilt(b1,a,sp(low_pos(pos_r))); % Filter non-peaks
+	if length(pos_r) > 2000
+		sp(low_pos(pos_r)) = filtfilt(b1,a,sp(low_pos(pos_r))); % Filter non-peaks
+	end
 end
 
 %% Output the result
