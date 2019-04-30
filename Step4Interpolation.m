@@ -1,4 +1,4 @@
-function [output] = Step4Interpolation(dg_train, Y_in, Y_compare, ecog_test, fingerFeats, show_plots, post_process)
+function [output] = Step4Interpolation(dg_train, Y_in, Y_compare, Y_pred, ecog_test, fingerFeats, show_plots, post_process)
 %UNTITLED4 Summary of this function goes here
 %   Detailed explanation goes here
 % Run through each finger
