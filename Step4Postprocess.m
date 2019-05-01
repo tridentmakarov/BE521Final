@@ -1,8 +1,8 @@
 function [output] = Step4Postprocess(dg_train, sp, fingerFeats, f_i, binary)
 
-peak_scales = [1.1, 1.0, 1.0, 1.25, 1.3];
-scales = [2.0, 1.0, 1.0, 1.25, 1.3];
+scales = [2.0, 1.8, 1.8, 1.9, 2.0];% <--- HIGHER NUMBER = FEWER PEAKS
 scale = scales(f_i);
+peak_scales = [1.1, 1.0, 1.0, 1.2, 1.2];
 peak_scale = peak_scales(f_i); %		<--- CHANGE FOR SCALING OF PEAK HEIGHTS
 windowSize = 900; %		<--- WINDOW SIZE FOR NON-PEAKS
 roll_size = 5000;%		<--- ROLLING WINDOW SIZE
