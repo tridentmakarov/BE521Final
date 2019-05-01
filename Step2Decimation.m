@@ -13,7 +13,7 @@ function [Y, fingerFeats, out_binary] = Step2Decimation(dg_train)
 % 		plot(Y(:, i))
 % 		hold off
 	end
-	fprintf('User variability: %.3f\n', mean(finger_variability));
+% 	fprintf('User variability: %.3f\n', mean(finger_variability));
 	fingerFeats.move_times = move_times;
 	fingerFeats.finger_peaks = finger_peaks;
 	fingerFeats.finger_offset = finger_offset;

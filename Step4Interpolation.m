@@ -3,6 +3,7 @@ function [output] = Step4Interpolation(dg_train, Y_in, Y_compare, train_binary, 
 %   Detailed explanation goes here
 % Run through each finger
 	disp('Interpolating the finger positions')
+	
 	for i = 1:5
 		y = Y_in(:, i); % Get y value of finger
 		y_c = Y_compare(:, i); % Get y value of finger
@@ -16,10 +17,8 @@ function [output] = Step4Interpolation(dg_train, Y_in, Y_compare, train_binary, 
 
 		%% Post-process
 		if post_process == true
-			sp(i, :) = Step4Postprocess(...
-				0,				sp(i, :),	fingerFeats, i, test_binary(:, i));
-			sp_c(i, :) = Step4Postprocess(...
-				dg_train(:, i), sp_c(i, :), fingerFeats, i, train_binary(:, i));
+			sp(i, :) = Step4Postprocess(0,sp(i, :),	fingerFeats, i, test_binary);
+			sp_c(i, :) = Step4Postprocess(dg_train(:, i), sp_c(i, :), fingerFeats, i, train_binary);
 % 			sp(i, :) = Step4PostprocessSVD(0, sp(i, :), fingerFeats, i, test_binary{i});
 % 			sp_c(i, :) = Step4PostprocessSVD(dg_train(:, i), sp_c(i, :), fingerFeats, i, train_binary(:, i));
 		end

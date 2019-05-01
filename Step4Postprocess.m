@@ -1,8 +1,10 @@
 function [output] = Step4Postprocess(dg_train, sp, fingerFeats, f_i, binary)
 
-scale = 1.0;
-peak_scale = 1.25; %		<--- CHANGE FOR SCALING OF PEAK HEIGHTS
-windowSize = 500; %		<--- WINDOW SIZE FOR NON-PEAKS
+peak_scales = [1.1, 1.0, 1.0, 1.25, 1.3];
+scales = [2.0, 1.0, 1.0, 1.25, 1.3];
+scale = scales(f_i);
+peak_scale = peak_scales(f_i); %		<--- CHANGE FOR SCALING OF PEAK HEIGHTS
+windowSize = 900; %		<--- WINDOW SIZE FOR NON-PEAKS
 roll_size = 5000;%		<--- ROLLING WINDOW SIZE
 
 %% Get finger feature values
@@ -64,7 +66,7 @@ end
 %% Define the ranges for easier peak scaling
 low_pos = 1:length(sp);
 if ~isempty(peaks_max) % Checks to make sure peaks exist
-	peak_ratio = peak / max(peaks_max) * peak_scale; % Scales peaks 
+	peak_ratio = peak / mean(peaks_max) * peak_scale; % Scales peaks 
 	
 	[r, c] = size(plot_locs); % For reshape
 	high_pos = reshape(plot_locs, [], r*c); % Reshape to vector of peaks
@@ -95,17 +97,17 @@ sp(low_pos) = filtfilt(b1,a,sp(low_pos));
 % end
 
 % Plots if using the training data
-% if length(dg_train) > 1
-% 	figure()
-% 	plot(sp)
-% 	hold on
-% % 	plot(sp_store)
-% 	plot(dg_train)
-% % 	plot(plot_locs, sp(plot_locs), '*r')
-% % 	legend('true', 'original', 'calculated')
-% 	legend('calculated', 'og shit')
-% 	hold off
-% end
+if length(dg_train) > 1
+	figure()
+	plot(sp)
+	hold on
+% 	plot(sp_store)
+	plot(dg_train)
+% 	plot(plot_locs, sp(plot_locs), '*r')
+% 	legend('true', 'original', 'calculated')
+	legend('calculated', 'og shit')
+	hold off
+end
 
 % Plots if using the testing data
 % if length(dg_train) == 1
@@ -118,6 +120,7 @@ sp(low_pos) = filtfilt(b1,a,sp(low_pos));
 % end
 
 %% Output the result
+sp(sp < mean(sp) - 4 * std(sp)) = mean(sp);
 output = sp;
 
 end

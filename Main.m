@@ -63,6 +63,12 @@ function output = AllSteps(ecog_train, dg_train, ecog_test, show_plots, post_pro
 	[Y_out, Y_compare, test_binary] = Step3LinearRegression(Y, datasets, train_binary, set);
 
 	%% Step 4: Interpolation
+	
+% 	load('training_predicted_labels.mat')
+% 	load('testset_predicted_labels.mat')
+% 	train_labels = new_predicted_labels{set};
+% 	test_labels = predicted_labels_test{set};
+	
 	[output] = Step4Interpolation(dg_train, Y_out, Y_compare, train_binary, test_binary, ecog_test, fingerFeats, show_plots, post_process);
 	
 	output = [zeros(37, 5); output(38:size(output, 1), :)];

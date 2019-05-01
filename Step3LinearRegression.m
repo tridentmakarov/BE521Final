@@ -3,21 +3,23 @@ function [Y_out, Y_compare, Y_pred] = Step3LinearRegression(Y_in, datasets, out_
 %   Detailed explanation goes here
 	disp('Performing regression')
 	
-	filename_SVM = sprintf('MatFiles/SVM_train_%d.mat', set);
-	if ~isfile(filename_SVM)
-		for i = 1:5
-			fprintf('Training SVM %d\n', i);
-			binary = out_binary(:, i);
-			Mdl{i} = fitcsvm(datasets{1}, binary(1:size(datasets{1},1)));
-			Y_pred{i} = predict(Mdl{i}, datasets{2});
-		end
-		save(filename_SVM, 'Mdl');
-	else
-		load(filename_SVM);
-		for i = 1:5
-			Y_pred(:, i) = predict(Mdl{i}, datasets{2});
-		end
-	end
+% 	filename_SVM = sprintf('MatFiles/SVM_train_%d.mat', set);
+% 	if ~isfile(filename_SVM)
+% 		for i = 1:5
+% 			fprintf('Training SVM %d\n', i);
+% 			binary = out_binary(:, i);
+% 			Mdl{i} = fitcsvm(datasets{1}, binary(1:size(datasets{1},1)));
+% 			Y_pred{i} = predict(Mdl{i}, datasets{2});
+% 		end
+% 		save(filename_SVM, 'Mdl');
+% 	else
+% 		load(filename_SVM);
+% 		for i = 1:5
+% 			Y_pred(:, i) = predict(Mdl{i}, datasets{2});
+% 		end
+% 	end
+
+	Y_pred = 1;
 	
 	
 	X = cell(1, 2);
