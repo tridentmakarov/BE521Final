@@ -15,7 +15,7 @@ function [Y_out, Y_compare, Y_pred] = Step3LinearRegression(Y_in, datasets, out_
 	else
 		load(filename_SVM);
 		for i = 1:5
-			Y_pred{i} = predict(Mdl{i}, datasets{2});
+			Y_pred(:, i) = predict(Mdl{i}, datasets{2});
 		end
 	end
 	

@@ -57,6 +57,7 @@ function output = AllSteps(ecog_train, dg_train, ecog_test, show_plots, post_pro
 	[Y, fingerFeats, train_binary] = Step2Decimation(dg_train);
 
 	%% Step 3: Linear regression
+% 	output = 1;
 
 	datasets = {features_train, features_test};
 	[Y_out, Y_compare, test_binary] = Step3LinearRegression(Y, datasets, train_binary, set);
@@ -64,7 +65,7 @@ function output = AllSteps(ecog_train, dg_train, ecog_test, show_plots, post_pro
 	%% Step 4: Interpolation
 	[output] = Step4Interpolation(dg_train, Y_out, Y_compare, train_binary, test_binary, ecog_test, fingerFeats, show_plots, post_process);
 	
-% 	output = [zeros(37, 5); output(38:size(output, 1), :)];
+	output = [zeros(37, 5); output(38:size(output, 1), :)];
 end
 
 

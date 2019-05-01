@@ -1,8 +1,11 @@
 function [features_train,features_test] = Step1GetFeatures(ecog_train, ecog_test, set, pre_process)
 %UNTITLED Summary of this function goes here
 %   Detailed explanation goes here
+% 	filename_train = sprintf('MatFiles/features_train_%d_prefilt.mat', set);
+% 	filename_test = sprintf('MatFiles/features_test_%d_prefilt.mat', set);
 	filename_train = sprintf('MatFiles/features_train_%d.mat', set);
 	filename_test = sprintf('MatFiles/features_test_%d.mat', set);
+
 
 	if ~isfile(filename_train) || ~isfile(filename_test)
 		features_train = getFeatures(ecog_train, pre_process);
@@ -28,7 +31,10 @@ function [output] = getFeatures(train_data, pre_process)
 		dev = mean(std(train_data));
 		avg = mean(mean(train_data));
 		
-		
+		windowSize = 1400; 
+		b1 = (1/windowSize)*ones(1,windowSize);
+		a = 1;
+		train_data = filtfilt(b1, a, train_data);
 		
 		for i = 1:size(train_data, 2)
 			low_locs = find(train_data(:, i) < avg - limit * dev);

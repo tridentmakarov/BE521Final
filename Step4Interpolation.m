@@ -16,8 +16,12 @@ function [output] = Step4Interpolation(dg_train, Y_in, Y_compare, train_binary, 
 
 		%% Post-process
 		if post_process == true
-			sp(i, :) = Step4Postprocess(0, sp(i, :), fingerFeats, i);
-			sp_c(i, :) = Step4Postprocess(dg_train(:, i), sp_c(i, :), fingerFeats, i);
+			sp(i, :) = Step4Postprocess(...
+				0,				sp(i, :),	fingerFeats, i, test_binary(:, i));
+			sp_c(i, :) = Step4Postprocess(...
+				dg_train(:, i), sp_c(i, :), fingerFeats, i, train_binary(:, i));
+% 			sp(i, :) = Step4PostprocessSVD(0, sp(i, :), fingerFeats, i, test_binary{i});
+% 			sp_c(i, :) = Step4PostprocessSVD(dg_train(:, i), sp_c(i, :), fingerFeats, i, train_binary(:, i));
 		end
 		
 		train_corr(i) = corr(sp_c(i, 1:size(dg_train, 1))', dg_train(:, i));

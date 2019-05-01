@@ -7,12 +7,13 @@ function [Y, fingerFeats, out_binary] = Step2Decimation(dg_train)
 		avg_time = round(move_times(i)/50);
 		temp = decimate(dg_train(:, i), 50); % Decimate to get Y matrix
 		Y(:, i) = temp(3:length(temp)-3); % Remove value
-		figure()
-		plot(out_binary(:, i), '*r')
-		hold on
-		plot(Y(:, i))
-		hold off
+% 		figure()
+% 		plot(out_binary(:, i), '*r')
+% 		hold on
+% 		plot(Y(:, i))
+% 		hold off
 	end
+	fprintf('User variability: %.3f\n', mean(finger_variability));
 	fingerFeats.move_times = move_times;
 	fingerFeats.finger_peaks = finger_peaks;
 	fingerFeats.finger_offset = finger_offset;

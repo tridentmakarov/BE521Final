@@ -1,8 +1,9 @@
-function [output] = Step4Postprocess(dg_train, sp, fingerFeats, f_i)
+function [output] = Step4Postprocess(dg_train, sp, fingerFeats, f_i, binary)
 
-peak_scale = 1.0; %		<--- CHANGE FOR SCALING OF PEAK HEIGHTS
-windowSize = 400; %		<--- WINDOW SIZE FOR NON-PEAKS
-roll_size = 10000;%		<--- ROLLING WINDOW SIZE
+scale = 2.0;
+peak_scale = 1.3; %		<--- CHANGE FOR SCALING OF PEAK HEIGHTS
+windowSize = 1400; %		<--- WINDOW SIZE FOR NON-PEAKS
+roll_size = 5000;%		<--- ROLLING WINDOW SIZE
 
 %% Get finger feature values
 times = fingerFeats.move_times(f_i); % Times spent moving
@@ -22,7 +23,7 @@ ranges = [5, 15; 20, 25; 75, 115; 125, 160; 160, 175];
 
 %% Find peaks, this works very well
 [~, ~, M] = MovingWinFeats(sp, sampleRate, winLen, winDisp, ranges);
-[~,locations] = findpeaks(M, 1, 'MinPeakProminence', std(M)*2.1);
+[~,locations] = findpeaks(M, 1, 'MinPeakProminence', std(M) * scale);
 % findpeaks(LL, 1, 'MinPeakProminence', std(LL)*2);
 locations = locations * sampleRate;
 locations(locations < 1) = 1;
@@ -31,13 +32,15 @@ locations(locations < 1) = 1;
 sp(sp > mean(sp) + 4 * std(sp)) = mean(sp);
 sp(sp < mean(sp) - 4 * std(sp)) = mean(sp);
 
+sp_store = sp;
+
 
 %% Find peaks and non-peaks, to filter and also visualize 
 plot_locs = [];
 for i = 1:length(locations)
 	% For some reason, the positions arent perfect and have to be moved left
-	left_pos = round(locations(i) - 0.02 * times);
-	right_pos = round(locations(i) + 0.98 * times);
+	left_pos = round(locations(i));
+	right_pos = round(locations(i) + 2 * times);
 	
 	% Create a matrix of all of the locations
 	plot_locs(:, i) = left_pos : right_pos;
@@ -47,35 +50,14 @@ for i = 1:length(locations)
 	plot_locs(plot_locs(:, i) > length(sp), i) = length(sp);
 end
 
-% Plots if using the training data
-% if length(dg_train) > 1
-% 	figure()
-% 	hold on
-% 	plot(sp)
-% 	plot(dg_train)
-% 	plot(plot_locs, sp(plot_locs), '--r')
-% 	legend('original', 'calculated')
-% 	hold off
-% end
-
-% Plots if using the testing data
-% if length(dg_train) == 1
-% 	figure()
-% 	hold on
-% 	plot(sp)
-% 	plot(plot_locs, sp(plot_locs), 'or')
-% 	legend('plot', 'peaks')
-% 	hold off
-% end
-
 %% Find the highest peak values
 peaks_max = [];
 for i = 1:length(locations)
 	loc = locations(i);
-	if loc + avg_time > length(sp)
+	if loc + avg_time * 2 > length(sp)
 		peaks_max(i) = max(sp(loc:length(sp)));
 	else
-		peaks_max(i) = max(sp(loc:loc + avg_time));
+		peaks_max(i) = max(sp(loc:loc + avg_time * 2));
 	end
 end
 
@@ -94,19 +76,46 @@ end
 %% Create vals for filter
 b1 = (1/windowSize)*ones(1,windowSize);
 a = 1;
-
+sp(low_pos) = filtfilt(b1,a,sp(low_pos));
 %% Rolling Filter
-for i = 1:roll_size:length(low_pos)
-	pos_r = i : i + roll_size - 1;
-	pos_r(pos_r > length(low_pos)) = [];
-	new_vari = std(sp(low_pos(pos_r)));
-	offset = mean(sp(low_pos(pos_r)));
-	vari_ratio = vari / new_vari;
-	sp(low_pos(pos_r)) = (sp(low_pos(pos_r)) - offset)*vari_ratio + offset;
-	if length(pos_r) > 2000
-		sp(low_pos(pos_r)) = filtfilt(b1,a,sp(low_pos(pos_r))); % Filter non-peaks
-	end
+% figure()
+% plot(sp)
+% for i = 1:roll_size:length(low_pos)
+% 	pos_r = i : i + roll_size - 1;
+% 	pos_r(pos_r > length(low_pos)) = [];
+% 	new_vari = std(sp(low_pos(pos_r)));
+% 	offset = mean(sp(low_pos(pos_r)));
+% 	vari_ratio = vari / new_vari;
+% 	sp(low_pos(pos_r)) = (sp(low_pos(pos_r)))*vari_ratio;
+% 	if length(pos_r) > 1400
+% 		sp(low_pos(pos_r)) = filtfilt(b1,a,sp(low_pos(pos_r))); % Filter non-peaks
+% 	end
+% % 	plot(sp)
+% % 	pause(0.2)
+% end
+
+% Plots if using the training data
+if length(dg_train) > 1
+	figure()
+	plot(sp)
+	hold on
+% 	plot(sp_store)
+	plot(dg_train)
+% 	plot(plot_locs, sp(plot_locs), '*r')
+% 	legend('true', 'original', 'calculated')
+	legend('calculated', 'og shit')
+	hold off
 end
+
+% Plots if using the testing data
+% if length(dg_train) == 1
+% 	figure()
+% 	hold on
+% 	plot(sp)
+% 	plot(plot_locs, sp(plot_locs), 'or')
+% 	legend('plot', 'peaks')
+% 	hold off
+% end
 
 %% Output the result
 output = sp;
