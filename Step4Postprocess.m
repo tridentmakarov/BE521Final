@@ -1,8 +1,8 @@
 function [output] = Step4Postprocess(dg_train, sp, fingerFeats, f_i, binary)
 
-scale = 2.0;
-peak_scale = 1.3; %		<--- CHANGE FOR SCALING OF PEAK HEIGHTS
-windowSize = 1400; %		<--- WINDOW SIZE FOR NON-PEAKS
+scale = 1.0;
+peak_scale = 1.25; %		<--- CHANGE FOR SCALING OF PEAK HEIGHTS
+windowSize = 500; %		<--- WINDOW SIZE FOR NON-PEAKS
 roll_size = 5000;%		<--- ROLLING WINDOW SIZE
 
 %% Get finger feature values
@@ -95,17 +95,17 @@ sp(low_pos) = filtfilt(b1,a,sp(low_pos));
 % end
 
 % Plots if using the training data
-if length(dg_train) > 1
-	figure()
-	plot(sp)
-	hold on
-% 	plot(sp_store)
-	plot(dg_train)
-% 	plot(plot_locs, sp(plot_locs), '*r')
-% 	legend('true', 'original', 'calculated')
-	legend('calculated', 'og shit')
-	hold off
-end
+% if length(dg_train) > 1
+% 	figure()
+% 	plot(sp)
+% 	hold on
+% % 	plot(sp_store)
+% 	plot(dg_train)
+% % 	plot(plot_locs, sp(plot_locs), '*r')
+% % 	legend('true', 'original', 'calculated')
+% 	legend('calculated', 'og shit')
+% 	hold off
+% end
 
 % Plots if using the testing data
 % if length(dg_train) == 1
