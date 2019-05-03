@@ -1,9 +1,9 @@
 function [output] = Step4Postprocess(dg_train, sp, fingerFeats, f_i, binary)
 
-scale = 1.0;
-peak_scale = 1.25; %		<--- CHANGE FOR SCALING OF PEAK HEIGHTS
-windowSize = 500; %		<--- WINDOW SIZE FOR NON-PEAKS
-roll_size = 5000;%		<--- ROLLING WINDOW SIZE
+scale = 1.8;
+peak_scale = 1.25;
+windowSize = 1000;	
+roll_size = 5000;
 
 %% Get finger feature values
 times = fingerFeats.move_times(f_i); % Times spent moving

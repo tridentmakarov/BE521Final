@@ -3,8 +3,8 @@ function [features_train,features_test] = Step1GetFeatures(ecog_train, ecog_test
 %   Detailed explanation goes here
 % 	filename_train = sprintf('MatFiles/features_train_%d_prefilt.mat', set);
 % 	filename_test = sprintf('MatFiles/features_test_%d_prefilt.mat', set);
-	filename_train = sprintf('MatFiles/features_train_%d_A.mat', set);
-	filename_test = sprintf('MatFiles/features_test_%d_A.mat', set);
+	filename_train = sprintf('MatFiles/features_train_%d.mat', set);
+	filename_test = sprintf('MatFiles/features_test_%d.mat', set);
 
 
 	if ~isfile(filename_train) || ~isfile(filename_test)
