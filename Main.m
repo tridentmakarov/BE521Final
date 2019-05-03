@@ -59,17 +59,35 @@ function output = AllSteps(ecog_train, dg_train, ecog_test, show_plots, post_pro
 	%% Step 3: Linear regression
 % 	output = 1;
 
-	datasets = {features_train, features_test};
-	[Y_out, Y_compare, test_binary] = Step3LinearRegression(Y, datasets, train_binary, set);
+	filename_train = sprintf('MatFiles/Y_out_%d.mat', set);
+	filename_test = sprintf('MatFiles/Y_compare_%d.mat', set);
+	filename_binary = sprintf('MatFiles/test_binary_%d.mat', set);
+	
+	if ~isfile(filename_train) || ~isfile(filename_test) || ~isfile(filename_test)
+		
+		fprintf('Saving files: %s, %s, and %s\n', filename_train, filename_test, filename_binary);
+		datasets = {features_train, features_test};
+		[Y_out, Y_compare, test_binary] = Step3LinearRegression(Y, datasets, train_binary, set);
+
+		save(filename_train, 'Y_out');
+		save(filename_test, 'Y_compare');
+		save(filename_binary, 'test_binary');
+	else
+		fprintf('Loading files: %s, %s, and %s\n', filename_train, filename_test, filename_binary);
+		load(filename_train);
+		load(filename_test);
+		load(filename_binary);
+	end
+	
 
 	%% Step 4: Interpolation
 	
-% 	load('training_predicted_labels.mat')
-% 	load('testset_predicted_labels.mat')
-% 	train_labels = new_predicted_labels{set};
-% 	test_labels = predicted_labels_test{set};
+	load('new_mdl_train_label_predictions.mat')
+	load('new_mdl_test_label_predictions.mat')
+	train_binary = new_predicted_labels{set};
+	test_binary = predicted_labels_test{set};
 	
-	[output] = Step4Interpolation(dg_train, Y_out, Y_compare, train_binary, test_binary, ecog_test, fingerFeats, show_plots, post_process);
+	[output] = Step4Interpolation(dg_train, Y_out, Y_compare, train_binary, test_binary, ecog_test, fingerFeats, show_plots, post_process, set);
 	
 	output = [zeros(37, 5); output(38:size(output, 1), :)];
 end

@@ -1,4 +1,4 @@
-function [output] = Step4Interpolation(dg_train, Y_in, Y_compare, train_binary, test_binary, ecog_test, fingerFeats, show_plots, post_process)
+function [output] = Step4Interpolation(dg_train, Y_in, Y_compare, train_binary, test_binary, ecog_test, fingerFeats, show_plots, post_process, set)
 %UNTITLED4 Summary of this function goes here
 %   Detailed explanation goes here
 % Run through each finger
@@ -17,8 +17,8 @@ function [output] = Step4Interpolation(dg_train, Y_in, Y_compare, train_binary, 
 
 		%% Post-process
 		if post_process == true
-			sp(i, :) = Step4Postprocess(0,sp(i, :),	fingerFeats, i, test_binary);
-			sp_c(i, :) = Step4Postprocess(dg_train(:, i), sp_c(i, :), fingerFeats, i, train_binary);
+			sp(i, :) = Step4Postprocess(0,sp(i, :),	fingerFeats, i, test_binary{i}, set);
+			sp_c(i, :) = Step4Postprocess(dg_train(:, i), sp_c(i, :), fingerFeats, i, train_binary{i}, set);
 % 			sp(i, :) = Step4PostprocessSVD(0, sp(i, :), fingerFeats, i, test_binary{i});
 % 			sp_c(i, :) = Step4PostprocessSVD(dg_train(:, i), sp_c(i, :), fingerFeats, i, train_binary(:, i));
 		end
